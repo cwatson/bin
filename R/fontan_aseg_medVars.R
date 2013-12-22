@@ -1,4 +1,5 @@
-# Read in all data from a csv file and do some volumetric analyses and plots.
+# Read in all data from a csv file and do some volumetric analyses and plots
+# for the Fontan study.
 #
 #_______________________________________________________________________________
 # by Chris Watson, 2013-02-22
@@ -82,8 +83,6 @@ P.all <- R$P[1:14, 15:20]
 R.all.p <- R.p$r[1:14, 15:20]
 P.all.p <- R.p$P[1:14, 15:20]
 
-#ifelse(abs(R.all) > 0.3, 1, 0)
-#ifelse(abs(P.all) < 0.001, 1, 0)
 
 # Adjust p-values using the Benjamini-Hochberg method
 P.all.adjusted <- matrix(p.adjust(P.all, method="fdr"), nrow=kNumStructs,
@@ -97,7 +96,6 @@ row.names(P.all.adjusted) <- row.names(P.all)
 P.all.adjusted.p <- data.frame(P.all.adjusted.p)
 names(P.all.adjusted.p) <- names(all.vars)
 row.names(P.all.adjusted.p) <- row.names(P.all)
-#ifelse(abs(P.all.adjusted) < 0.05, 1, 0)
 
 
 #===============================================================================
@@ -131,16 +129,9 @@ boxplot(fontan.df[, i+17] ~ fontan.df[, med.var], xlab=med.var,
   ylab=names(fontan.structs)[i])
 }
 
-
 # Do a simple linear model with struct.ind against GROUP
-p.lm <- vector()
-for (i in 1:kNumStructs) {
-  current.vol <- colnames(all.structs)[i]
-  assign(paste("model.", current.vol, sep=""), lm(eval(parse(text=current.vol)) ~
-    Age + Sex + IntraCranialVol + as.factor(Scanner) + GROUP, data=all.data))
-  p.lm[i] <- eval(parse(text=paste("summary(model.", current.vol,
-    ")$coefficients[6,4]", sep="")))
-}
-
+all.structs.lm <- lapply(all.structs, function(x)
+  lm(x ~ Age + Sex + IntraCranialVol + as.factor(Scanner) + GROUP,
+  data=all.data))
+p.lm <- lapply(all.structs.lm, function(x) summary(x)$coefficients[6, 4])
 p.lm.adjusted <- data.frame(p.vals=p.adjust(p.lm, method="fdr"))
-row.names(p.lm.adjusted) <- names(fontan.structs)
