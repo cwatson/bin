@@ -11,7 +11,6 @@ fontan.df <- subset(all.data, GROUP=='FONTAN')
 
 kNumControls <- dim(control.df)[1]
 kNumFontans <- dim(fontan.df)[1]
-#pts <- seq(49,177)
 
 #===============================================================================
 # Perform Wilcoxon rank sum tests for some demographic var's

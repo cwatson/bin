@@ -3,42 +3,26 @@
 #
 #_______________________________________________________________________________
 # by Chris Watson, 2012-12-18
-num.controls <- 49
-num.tga <- 92
+kNumControls <- 49
+kNumTGA <- 92
 
 all.subs <- read.csv('all-subs.csv', header=TRUE)
-all.subs$group <- c(vector(mode="numeric", length=num.controls),
-  vector(mode="numeric", length=num.tga) + 1)
+all.subs$group <- c(rep(0, kNumControls), rep(1, kNumTGA))
+
+all.subs.lm <- lapply(all.subs[, 2:15], function(x)
+  lm(x ~ group + Age + Gender + Scanner + IntraCranialVol, data=all.subs)
+all.subs.cook <- lapply(all.subs.lm, cooks.distance)
 
 for (i in 2:15) {
-  current.vol <- colnames(all.subs)[i]
-  assign(paste("model.", current.vol, sep=""), lm(eval(parse(text=current.vol)) ~
-    group + Age + Gender + Scanner + IntraCranialVol, data=all.subs))
-
-  assign(paste("cook.", current.vol, sep=""), cooks.distance(eval(parse(text=paste("model.",
-    current.vol, sep="")))))
-
-  png(file=paste("outlier-tests/", current.vol, ".png", sep=""), bg="white")
-  plot(eval(parse(text=paste("cook.", current.vol, sep=""))))
+  png(file=paste("outlier-tests/", names(all.subs.lm)[i], ".png", sep=""),
+    bg="white")
+  plot(all.subs.cook[[i]], ylab=names(all.subs.cook)[i], xlab='Subject')
   dev.off()
 }
 
 # Do some cortical thickness stuff
-
 all.lms <- function(thick.table) {
-  models.list <- list()
-  for (i in 6:39) {
-    current.vol <- colnames(thick.table)[i]
-    models.list[[i-5]] <- list()
-    models.list[[i-5]] <- lm(eval(parse(text=current.vol))
-      ~ Group + Age + Sex + Scanner, data=thick.table)
-  }
-
-  for (i in 1:34) {
-    p <- summary(models.list[[i]])$coefficients[2, 4]
-    if (p < 0.05) {
-      cat(colnames(thick.table)[i+5], '\t')
-      cat(p, '\n')
-    }
-  }
+  models.list <- lapply(thick.table, function(x)
+    lm(x ~ Group + Age + Sex + Scanner, data=thick.table))
+  p <- lapply(models.list, function(x) summary(x)$coefficients[2, 4])
 }
