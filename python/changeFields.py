@@ -16,8 +16,8 @@ def main():
         fields = line.split(',')
 
         name = fields[int(c)-1].split(' ')
-        lastname = name[1]
-        firstname = name[0]
+        lastname = name[0]
+        firstname = name[1]
 
         fout.write('"%s,%s"\n' % (lastname,firstname))
 
