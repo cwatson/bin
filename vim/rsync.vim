@@ -31,8 +31,14 @@ syn match   rsyncDir        display '\.d..[.t].*'
 syn match   rsyncDirNew     display 'cd+.*'
 
 syn match   rsyncNum        display ' [0-9\.]*[MKG]*'
+syn match   rsyncNum        display ' [0-9]*,[0-9]*'
 
 syn match   rsyncTimeConst  display ' [0-9\.]* seconds'
+
+syn match   rsyncInfoReg    display 'reg: [0-9]*[,]*[0-9]*'
+syn match   rsyncInfoDir    display 'dir: [0-9]*[,]*[0-9]*'
+syn match   rsyncInfoLink   display 'link: [0-9]*[,]*[0-9]*'
+syn match   rsyncInfoSpec   display 'special: [0-9]*[,]*[0-9]*'
 
 hi def link rsyncDelete     Error
 hi def link rsyncDate       Special
@@ -45,5 +51,11 @@ hi def link rsyncDir        PreCondit
 hi def link rsyncDirNew     PreCondit
 hi def link rsyncNum        Constant
 hi def link rsyncTimeconst  Type
+
+"TODO fix these; the numbers are no longer highlighted
+hi def link rsyncInfoReg    Type
+hi def link rsyncInfoDir    PreCondit
+hi def link rsyncInfoLink   Identifier
+hi def link rsyncInfoSpec   Special
 
 let b:current_syntax = "rsync"
