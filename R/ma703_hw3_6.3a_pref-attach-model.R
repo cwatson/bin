@@ -1,1 +1,0 @@
-/home/cwatson/Desktop/documents/CLASSES/./Fall2013/ma703/hw/hw3/code/ma703_hw3_6.3a_pref-attach-model.R
