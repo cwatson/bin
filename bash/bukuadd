@@ -1,0 +1,56 @@
+#! /bin/bash
+set -a
+
+clr=$(tput sgr0)
+myyellow=$(tput bold; tput setaf 3)
+mygreen=$(tput bold; tput setaf 2)
+mymagenta=$(tput bold; tput setaf 5)
+myblue=$(tput bold; tput setaf 4)
+
+usage() {
+    cat << !
+
+Add a URL to the ${myblue}buku${clr} command-line bookmark manager. The URL must
+be an ${myblue}X selection${clr} (e.g., the system clipboard).
+
+${myyellow}USAGE:${mygreen}
+    $(basename $0) -t TITLE -g TAGS
+
+${myyellow}OPTIONS:
+    ${mymagenta}-t${clr}
+        Specify the title of the database entry for the given URL. If you want
+        to use the page's title, leave this blank.
+
+    ${mymagenta}-g${clr}
+        Specify the tag(s) for the given URL. This should be a single
+        word/string or a comma-separated list.
+
+${myyellow}EXAMPLES:${mygreen}
+    $(basename $0) -t "Org tutorials" -g "orgmode,productivity"
+    $(basename $0) -g "orgmode,productivity"
+
+!
+}
+
+title=''
+tags=''
+while getopts "t:g:" OPTION; do
+    case $OPTION in
+        t) title="$OPTARG" ;;
+        g) tags="$OPTARG" ;;
+        *) usage && exit ;;
+    esac
+done
+
+[[ -z ${title} ]] && [[ -z ${tags} ]] && usage && exit
+
+url=$(xsel)
+args=("buku" -a "${url}")
+if [[ -n ${title} ]]; then
+    args+=(--title "${title}")
+fi
+if [[ -n ${tags} ]]; then
+    args+=(--tag "${tags}")
+fi
+
+"${args[@]}"
